@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Your collaborative documents dashboard. Create, share, and edit documents in real-time.">
+    <title>Dashboard — Collaborative Notes</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+</head>
+
+<body>
+    <div class="dashboard-page">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <div class="logo-icon">📝</div>
+                <span>Collaborative Notes</span>
+            </div>
+            <div class="navbar-actions">
+                <div class="user-badge">
+                    <div class="avatar" id="user-avatar-letter">U</div>
+                    <span id="user-display-name">User</span>
+                </div>
+                <button class="btn btn-ghost btn-sm" id="logout-btn">Sign Out</button>
+            </div>
+        </nav>
+
+        <!-- Content -->
+        <div class="dashboard-content">
+            <!-- Header -->
+            <div class="dashboard-header">
+                <h1 class="page-title">My Documents</h1>
+                <div class="search-bar">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="form-input" id="search-input" placeholder="Search documents..."
+                        autocomplete="off">
+                    <button class="search-clear" id="search-clear" title="Clear search">&times;</button>
+                </div>
+                <button class="btn btn-primary" id="create-doc-btn">
+                    New Document
+                </button>
+            </div>
+
+            <!-- Stats -->
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-total">0</div>
+                    <div class="stat-label">Total Documents</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-owned">0</div>
+                    <div class="stat-label">My Documents</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-shared">0</div>
+                    <div class="stat-label">Shared With Me</div>
+                </div>
+            </div>
+
+            <!-- My Documents -->
+            <div class="documents-section">
+                <h2 class="section-title">My Documents</h2>
+                <div class="documents-grid" id="my-docs-grid">
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="spinner" style="margin: 0 auto;"></div>
+                        <p style="margin-top: 16px;">Loading documents...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shared Documents -->
+            <div class="documents-section" id="shared-docs-section" style="display: none;">
+                <h2 class="section-title">Shared With Me</h2>
+                <div class="documents-grid" id="shared-docs-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Document Modal -->
+    <div class="modal-overlay" id="create-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">New Document</h3>
+                <button class="modal-close" id="close-create-modal">&times;</button>
+            </div>
+            <form id="create-doc-form">
+                <div class="form-group">
+                    <label class="form-label" for="doc-title-input">Document Title</label>
+                    <input type="text" class="form-input" id="doc-title-input"
+                        placeholder="e.g., OS Notes, Project Plan..." required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="document.getElementById('create-modal').classList.remove('active')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Document</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Share Document Modal -->
+    <div class="modal-overlay" id="share-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Share Document</h3>
+                <button class="modal-close" id="close-share-modal">&times;</button>
+            </div>
+            <p class="text-secondary" style="margin-bottom: 16px;">
+                Sharing: <strong id="share-doc-title"></strong>
+            </p>
+            <form id="share-form">
+                <input type="hidden" id="share-doc-id">
+                <div class="form-group">
+                    <label class="form-label" for="share-username-input">Username to share with</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" class="form-input" id="share-username-input" placeholder="Enter username"
+                            required>
+                        <button type="submit" class="btn btn-primary">Share</button>
+                    </div>
+                </div>
+            </form>
+            <div class="share-user-list" id="shared-users-list"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+</body>
+
+</html>
