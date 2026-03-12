@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Real-Time Collaborative Notes — Edit documents together in real-time with multiple users.">
+    <title>Collaborative Notes — Sign In</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+</head>
+
+<body>
+    <div class="auth-page">
+        <!-- Floating orb decorations (CSS handles them) -->
+
+        <div class="auth-container">
+            <div class="auth-card">
+                <!-- Header -->
+                <div class="auth-header">
+                    <div class="logo">📝</div>
+                    <h1>Collaborative Notes</h1>
+                    <p>Real-time document editing, beautifully crafted</p>
+                </div>
+
+                <!-- Tabs -->
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-tab="login" id="tab-login">Sign In</button>
+                    <button class="auth-tab" data-tab="register" id="tab-register">Create Account</button>
+                </div>
+
+                <!-- Error Message -->
+                <div class="auth-error" id="auth-error"></div>
+
+                <!-- Login Form -->
+                <form class="auth-form" id="login-form">
+                    <div class="form-group">
+                        <label class="form-label" for="login-username">Username</label>
+                        <input type="text" class="form-input" id="login-username" placeholder="Enter your username"
+                            required autocomplete="username">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="login-password">Password</label>
+                        <input type="password" class="form-input" id="login-password" placeholder="Enter your password"
+                            required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg">Sign In →</button>
+                </form>
+
+                <!-- Register Form (hidden by default) -->
+                <form class="auth-form" id="register-form" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label" for="register-username">Username</label>
+                        <input type="text" class="form-input" id="register-username" placeholder="Choose a username"
+                            required autocomplete="username">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="register-email">Email</label>
+                        <input type="email" class="form-input" id="register-email" placeholder="you@example.com"
+                            required autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="register-password">Password</label>
+                        <input type="password" class="form-input" id="register-password"
+                            placeholder="At least 6 characters" required autocomplete="new-password" minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="register-confirm-password">Confirm Password</label>
+                        <input type="password" class="form-input" id="register-confirm-password"
+                            placeholder="Confirm your password" required autocomplete="new-password">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg">Create Account →</button>
+                </form>
+            </div>
+
+            <p
+                style="text-align: center; margin-top: 24px; font-size: 0.78rem; color: var(--text-muted); letter-spacing: 0.02em;">
+                Built with FastAPI & WebSockets ⚡
+            </p>
+        </div>
+    </div>
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/auth.js"></script>
+</body>
+
+</html>
