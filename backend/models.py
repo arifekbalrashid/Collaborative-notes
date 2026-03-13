@@ -7,6 +7,14 @@ from database import Base
 import enum
 
 
+# MySQL table options for full Unicode (emoji) support
+MYSQL_TABLE_ARGS = {
+    "mysql_engine": "InnoDB",
+    "mysql_charset": "utf8mb4",
+    "mysql_collate": "utf8mb4_unicode_ci",
+}
+
+
 class Permission(str, enum.Enum):
     VIEW = "view"
     EDIT = "edit"
@@ -14,6 +22,7 @@ class Permission(str, enum.Enum):
 
 class User(Base):
     __tablename__ = "users"
+    __table_args__ = MYSQL_TABLE_ARGS
 
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(50), unique=True, index=True, nullable=False)
@@ -28,6 +37,7 @@ class User(Base):
 
 class Document(Base):
     __tablename__ = "documents"
+    __table_args__ = MYSQL_TABLE_ARGS
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(200), nullable=False, default="Untitled Document")
@@ -45,6 +55,7 @@ class Document(Base):
 
 class DocumentShare(Base):
     __tablename__ = "document_shares"
+    __table_args__ = MYSQL_TABLE_ARGS
 
     id = Column(Integer, primary_key=True, index=True)
     document_id = Column(Integer, ForeignKey("documents.id"), nullable=False)
@@ -59,6 +70,7 @@ class DocumentShare(Base):
 
 class DocumentVersion(Base):
     __tablename__ = "document_versions"
+    __table_args__ = MYSQL_TABLE_ARGS
 
     id = Column(Integer, primary_key=True, index=True)
     document_id = Column(Integer, ForeignKey("documents.id"), nullable=False)
@@ -69,3 +81,4 @@ class DocumentVersion(Base):
     # Relationships
     document = relationship("Document", back_populates="versions")
     editor = relationship("User")
+

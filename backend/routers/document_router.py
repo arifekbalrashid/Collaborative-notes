@@ -2,14 +2,15 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, or_
+from sqlalchemy import select, or_, desc
 from sqlalchemy.orm import selectinload
 from typing import List
 from database import get_db
-from models import User, Document, DocumentShare
+from models import User, Document, DocumentShare, DocumentVersion
 from schemas import (
     DocumentCreate, DocumentUpdate, DocumentResponse,
     DocumentListItem, ShareDocument, ShareResponse, SharedUserInfo,
+    VersionResponse,
 )
 from auth import get_current_user
 
@@ -290,4 +291,39 @@ async def unshare_document(
 
     await db.delete(share)
     await db.commit()
+
+
+@router.get("/{doc_id}/versions", response_model=List[VersionResponse])
+async def get_versions(
+    doc_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get version history for a document."""
+    # Check access (any level is fine — view or edit)
+    await check_document_access(doc_id, current_user, db)
+
+    result = await db.execute(
+        select(DocumentVersion)
+        .where(DocumentVersion.document_id == doc_id)
+        .order_by(desc(DocumentVersion.created_at))
+        .limit(50)
+    )
+    versions = result.scalars().all()
+
+    items = []
+    for v in versions:
+        # Get editor username
+        editor_result = await db.execute(select(User).where(User.id == v.edited_by))
+        editor = editor_result.scalar_one_or_none()
+        items.append(VersionResponse(
+            id=v.id,
+            document_id=v.document_id,
+            content=v.content,
+            edited_by=v.edited_by,
+            editor_username=editor.username if editor else "Unknown",
+            created_at=v.created_at,
+        ))
+
+    return items
 
