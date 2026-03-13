@@ -29,7 +29,7 @@ services:
 
       # Path to Aiven CA certificate — written by build.sh
       - key: MYSQL_SSL_CA
-        value: "/etc/ssl/certs/aiven-ca.pem"
+        value: "./certs/aiven-ca.pem"
 
       # Paste the CA certificate content from Aiven Console → Overview → CA Certificate
       # (the full PEM text including BEGIN/END lines)

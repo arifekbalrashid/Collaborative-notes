@@ -34,12 +34,14 @@ fi
 echo ""
 echo "▶ [3/3] Writing Aiven CA certificate..."
 if [ -n "$AIVEN_CA_CERT" ]; then
-    # Ensure the target directory exists
-    mkdir -p /etc/ssl/certs
-
-    echo "$AIVEN_CA_CERT" > /etc/ssl/certs/aiven-ca.pem
-    chmod 644 /etc/ssl/certs/aiven-ca.pem
-    echo "✓ CA certificate written to /etc/ssl/certs/aiven-ca.pem"
+    # Write to app directory (writable on Render)
+    mkdir -p certs
+    echo "$AIVEN_CA_CERT" > ./certs/aiven-ca.pem
+    chmod 644 ./certs/aiven-ca.pem
+    echo "✓ CA certificate written to ./certs/aiven-ca.pem"
+    
+    # Export the path for use in the app
+    export MYSQL_SSL_CA="./certs/aiven-ca.pem"
 else
     echo "⚠ WARNING: AIVEN_CA_CERT env var is not set."
     echo "  SSL connections to Aiven MySQL will fail without it."
