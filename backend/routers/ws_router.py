@@ -39,14 +39,20 @@ async def websocket_endpoint(
             await websocket.close(code=4003, reason="Access denied")
             return
         permission = await get_user_permission(db, document_id, user_id)
+        # Get current document content to sync
+        from services.document_service import get_document_by_id
+        doc = await get_document_by_id(db, document_id)
+        current_content = doc.content if doc else ""
 
     # Connect user to the collaboration session
     connected_user = await collab_manager.connect(document_id, user_id, username, websocket)
 
-    # Send permission level to client so it can adjust the UI
+    # Send initial sync data
     await websocket.send_json({
-        "type": "permission",
+        "type": "init",
         "permission": permission,  # "owner", "edit", or "view"
+        "content": current_content,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
     })
 
     edit_count = 0
@@ -58,6 +64,11 @@ async def websocket_endpoint(
             raw_data = await websocket.receive_text()
             data = json.loads(raw_data)
             msg_type = data.get("type")
+
+            # Handle ping/pong for keep-alive
+            if msg_type == "ping":
+                await websocket.send_json({"type": "pong", "timestamp": datetime.now(timezone.utc).isoformat()})
+                continue
 
             if msg_type == "edit":
                 # Only allow edits from users with edit/owner permission

@@ -96,3 +96,11 @@ async def get_user_permission(db: AsyncSession, document_id: int, user_id: int) 
         return share.permission  # "edit" or "view"
 
     return "none"
+
+
+async def get_document_by_id(db: AsyncSession, document_id: int):
+    """Get a document by ID."""
+    result = await db.execute(
+        select(Document).where(Document.id == document_id)
+    )
+    return result.scalar_one_or_none()

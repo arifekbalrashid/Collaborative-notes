@@ -9,8 +9,13 @@ let typingTimeout = null;
 let autoSaveTimeout = null;
 let isRemoteUpdate = false;
 let myPermission = 'owner'; // will be set by server
+let reconnectAttempts = 0;
+let maxReconnectAttempts = 10;
+let reconnectDelay = 1000; // Start at 1 second
+let pingInterval = null; // Keep-alive interval
 const TYPING_DELAY = 1000;
 const AUTO_SAVE_DELAY = 5000;
+const PING_INTERVAL = 30000; // Send ping every 30 seconds
 
 // ── User Presence Cursors ──────────────────────────────
 const remoteCursors = new Map(); // username -> { position, selectionEnd, color }
@@ -87,30 +92,74 @@ function setupNavbar() {
 
 function connectWebSocket(docId) {
     const wsUrl = api.getWebSocketUrl(docId);
+    console.log('Connecting to WebSocket:', wsUrl);
     ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
+        console.log('WebSocket connected');
+        reconnectAttempts = 0;
+        reconnectDelay = 1000; // Reset delay on successful connection
         updateConnectionStatus('connected');
         showToast('Connected to live editing', 'success');
+        
+        // Start ping/pong keep-alive
+        clearInterval(pingInterval);
+        pingInterval = setInterval(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                console.log('Sending ping...');
+                ws.send(JSON.stringify({ type: 'ping' }));
+            }
+        }, PING_INTERVAL);
     };
 
     ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        handleWSMessage(data);
+        try {
+            const data = JSON.parse(event.data);
+            handleWSMessage(data);
+        } catch (error) {
+            console.error('Failed to parse WebSocket message:', error);
+        }
     };
 
     ws.onclose = () => {
+        console.log('WebSocket closed, reconnecting in', reconnectDelay, 'ms');
+        clearInterval(pingInterval);
         updateConnectionStatus('disconnected');
-        setTimeout(() => {
-            if (currentDoc) connectWebSocket(docId);
-        }, 3000);
+        
+        if (reconnectAttempts < maxReconnectAttempts) {
+            reconnectAttempts++;
+            setTimeout(() => {
+                if (currentDoc) {
+                    console.log('Reconnection attempt', reconnectAttempts);
+                    connectWebSocket(currentDoc.id);
+                }
+            }, reconnectDelay);
+            
+            // Exponential backoff: max out at 10 seconds
+            reconnectDelay = Math.min(reconnectDelay * 1.5, 10000);
+        } else {
+            showToast('Could not reconnect. Please refresh the page.', 'error');
+        }
     };
 
-    ws.onerror = () => updateConnectionStatus('error');
+    ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        updateConnectionStatus('error');
+        showToast('Connection error. Attempting to reconnect...', 'error');
+    };
 }
 
 function handleWSMessage(data) {
     switch (data.type) {
+        case 'init':
+            // Initial sync when connecting
+            applyPermission(data.permission);
+            if (data.content && data.content !== document.getElementById('editor-area').value) {
+                isRemoteUpdate = true;
+                document.getElementById('editor-area').value = data.content;
+                isRemoteUpdate = false;
+            }
+            break;
         case 'edit':
             handleRemoteEdit(data);
             break;
@@ -136,6 +185,9 @@ function handleWSMessage(data) {
             break;
         case 'permission':
             applyPermission(data.permission);
+            break;
+        case 'pong':
+            console.log('Received pong');
             break;
         case 'error':
             showToast(data.message, 'error');
@@ -511,8 +563,14 @@ function escapeHtml(text) {
 
 // Clean up on page leave
 window.addEventListener('beforeunload', () => {
-    if (ws) ws.close();
-    if (autoSaveTimeout) { clearTimeout(autoSaveTimeout); saveDocument(); }
+    clearInterval(pingInterval);
+    if (ws) {
+        ws.close();
+    }
+    if (autoSaveTimeout) {
+        clearTimeout(autoSaveTimeout);
+        saveDocument();
+    }
 });
 
 // ── Cursor Broadcasting ───────────────────────────────
