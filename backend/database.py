@@ -4,17 +4,17 @@ import ssl
 from pathlib import Path
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
-from backend.config import DATABASE_URL, AIVEN_CA_CERT
+from backend.config import DATABASE_URL, MYSQL_SSL_CA
 
 
 def _build_connect_args() -> dict:
-    if not AIVEN_CA_CERT:
+    if not MYSQL_SSL_CA:
         return {}
 
     cert_path = Path("/tmp/aiven-ca.pem")
 
-    if not cert_path.exists():
-        cert_path.write_text(AIVEN_CA_CERT)
+    if not cert_path.exists() and MYSQL_SSL_CA:
+        cert_path.write_text(MYSQL_SSL_CA)
 
     ctx = ssl.create_default_context(cafile=str(cert_path))
     ctx.check_hostname = False
@@ -30,7 +30,7 @@ engine = create_async_engine(
     pool_pre_ping=True,
     pool_size=5,
     max_overflow=5,
-    connect_args=_build_connect_args(),
+    connect_args=_build_connect_args() | {"connect_timeout": 10}
 )
 
 async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
