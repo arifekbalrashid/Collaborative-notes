@@ -9,7 +9,7 @@ from pathlib import Path
 
 from backend.database import init_db
 from backend.routers import auth_router, document_router, ws_router
-from config import PORT, ALLOWED_ORIGINS, MYSQL_SSL_CA
+from backend.config import PORT, ALLOWED_ORIGINS, MYSQL_SSL_CA
 
 
 @asynccontextmanager
