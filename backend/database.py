@@ -8,7 +8,7 @@ from backend.config import DATABASE_URL, MYSQL_SSL_CA
 
 
 def _build_connect_args() -> dict:
-    if not MYSQL_SSL_CA:
+    if not MYSQL_SSL_CA: 
         return {}
 
     cert_path = Path("/tmp/aiven-ca.pem")

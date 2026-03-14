@@ -23,7 +23,7 @@ PORT = int(os.getenv("PORT", "8000"))
 
 # Database — MySQL via aiomysql async driver
 _raw_db_url = os.getenv(
-    "DATABASE_URL",
+    "DATABASE_URL", 
     "mysql+aiomysql://root:password@localhost:3306/collaborative_notes",
 )
 
