@@ -65,13 +65,16 @@ async def health_check():
 
 # Serve frontend static files
 frontend_path = Path(__file__).parent.parent / "frontend"
-app.mount("/static", StaticFiles(directory=str(frontend_path)), name="static")
+if frontend_path.exists():
+    app.mount("/static", StaticFiles(directory=str(frontend_path)), name="static")
 
 
 # Frontend routes
 @app.get("/")
 async def serve_index():
-    return FileResponse(str(frontend_path / "index.html"))
+    if (frontend_path / "index.html").exists():
+        return FileResponse(str(frontend_path / "index.html"))
+    return {"message": "API running"}
 
 
 @app.get("/dashboard")
