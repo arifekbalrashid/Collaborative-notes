@@ -5,14 +5,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, or_, desc
 from sqlalchemy.orm import selectinload
 from typing import List
-from database import get_db
-from models import User, Document, DocumentShare, DocumentVersion
-from schemas import (
+from backend.database import get_db
+from backend.models import User, Document, DocumentShare, DocumentVersion
+from backend.schemas import (
     DocumentCreate, DocumentUpdate, DocumentResponse,
     DocumentListItem, ShareDocument, ShareResponse, SharedUserInfo,
     VersionResponse,
 )
-from auth import get_current_user
+from backend.auth import get_current_user
 
 router = APIRouter(prefix="/api/documents", tags=["Documents"])
 

@@ -3,7 +3,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy import desc
-from models import Document, DocumentVersion, DocumentShare, User
+from backend.models import Document, DocumentVersion, DocumentShare, User
 from datetime import datetime, timezone, timedelta
 
 # Minimum time between version snapshots (in seconds)

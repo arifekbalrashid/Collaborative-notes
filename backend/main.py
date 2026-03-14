@@ -7,8 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from database import init_db
-from routers import auth_router, document_router, ws_router
+from backend.database import init_db
+from backend.routers import auth_router, document_router, ws_router
 from config import PORT, ALLOWED_ORIGINS, MYSQL_SSL_CA
 
 

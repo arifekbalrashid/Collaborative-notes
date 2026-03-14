@@ -4,10 +4,10 @@ import json
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timezone
-from database import get_db, async_session
-from auth import decode_token
-from services.collaboration import collab_manager
-from services.document_service import save_document_content, check_user_has_access, get_user_permission
+from backend.database import get_db, async_session
+from backend.auth import decode_token
+from backend.services.collaboration import collab_manager
+from backend.services.document_service import save_document_content, check_user_has_access, get_user_permission
 
 router = APIRouter(tags=["WebSocket"])
 
