@@ -40,7 +40,7 @@ async def websocket_endpoint(
             return
         permission = await get_user_permission(db, document_id, user_id)
         # Get current document content to sync
-        from services.document_service import get_document_by_id
+        from backend.services.document_service import get_document_by_id
         doc = await get_document_by_id(db, document_id)
         current_content = doc.content if doc else ""
 
