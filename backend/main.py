@@ -33,6 +33,10 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+@app.get("/ping")
+def ping():
+    return {"status": "ok"}
+
 # CORS middleware
 origins = ["*"] if ALLOWED_ORIGINS == "*" else [o.strip() for o in ALLOWED_ORIGINS.split(",")]
 app.add_middleware(
